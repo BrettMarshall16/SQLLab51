@@ -1,4 +1,4 @@
-import { QMainWindow, QWidget, QLabel, FlexLayout, QPushButton, QIcon } from '@nodegui/nodegui';
+import { QMainWindow, QWidget, QLabel, FlexLayout, QPushButton, QIcon, QSize } from '@nodegui/nodegui';
 import logo from '../assets/logox200.png';
 const mysql = require('mysql');
 const database = mysql.createConnection({
@@ -24,12 +24,12 @@ database.connect(function(err){
     database.query(joinedTable,function(err, result){
         if(err) throw err;
         console.log("Table HeroSkills Created!");
-        console("Hello");
     })
 })
 
 const win = new QMainWindow();
 win.setWindowTitle("Hello World Test");
+
 
 const centralWidget = new QWidget();
 centralWidget.setObjectName("myroot");
@@ -37,21 +37,43 @@ const rootLayout = new FlexLayout();
 centralWidget.setLayout(rootLayout);
 
 const label = new QLabel();
-label.setObjectName("mylabel");
-label.setText("Hello");
+label.setObjectName("topLabel");
+label.setText("Welcome to the list of Super Heros");
 
-const button = new QPushButton();
-button.setIcon(new QIcon(logo));
+const addSuperHerobutton = new QPushButton();
+addSuperHerobutton.setText("Add Super Hero");
 
-const label2 = new QLabel();
-label2.setText("World");
-label2.setInlineStyle(`
-  color: red;
-`);
+const herolist = [];
+
+const listSuperHeros = new QPushButton();
+listSuperHeros.setText("List Super Heros");
+listSuperHeros.addEventListener("clicked", () => {
+  let listHeroTable = 'SELECT * FROM heroes';
+    database.query(listHeroTable ,function(err, results){
+      if(err) throw err;
+      for (let result of results){
+        herolist.push(result);
+      }
+    });
+listSuperHeros.addEventListener('clicked', () => {
+  for(let i = 0; i < herolist.length; i++)
+  showSuperHeros.setText(herolist[i].name + " " + herolist[i].alias);
+})
+});
+
+const showSuperHeros = new QLabel();
+
+
+
+const removeSuperHeros = new QPushButton();
+removeSuperHeros.setText("Add Super Hero");
+
 
 rootLayout.addWidget(label);
-rootLayout.addWidget(button);
-rootLayout.addWidget(label2);
+rootLayout.addWidget(addSuperHerobutton);
+rootLayout.addWidget(listSuperHeros);
+rootLayout.addWidget(showSuperHeros);
+rootLayout.addWidget(removeSuperHeros);
 win.setCentralWidget(centralWidget);
 win.setStyleSheet(
   `
