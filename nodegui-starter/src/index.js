@@ -1,4 +1,4 @@
-import { QMainWindow, QWidget, QLabel, FlexLayout, QPushButton, QIcon, QSize } from '@nodegui/nodegui';
+import { QMainWindow, QWidget, QLabel, FlexLayout, QPushButton, QIcon, QSize, QPlainTextEdit, QMenu, QTextEdit   } from '@nodegui/nodegui';
 import logo from '../assets/logox200.png';
 const mysql = require('mysql');
 const database = mysql.createConnection({
@@ -25,6 +25,7 @@ database.connect(function(err){
         if(err) throw err;
         console.log("Table HeroSkills Created!");
     })
+    
 })
 
 const win = new QMainWindow();
@@ -42,6 +43,21 @@ label.setText("Welcome to the list of Super Heros");
 
 const addSuperHerobutton = new QPushButton();
 addSuperHerobutton.setText("Add Super Hero");
+const heroName = new QPlainTextEdit();
+heroName.setObjectName("heroName");
+const heroAlias = new QPlainTextEdit();
+heroAlias.setObjectName("heroName");
+const heroEmail = new QPlainTextEdit();
+heroEmail.setObjectName("heroName");
+addSuperHerobutton.addEventListener('clicked', ()=>{
+  let theHeroName = heroName.toPlainText();
+  let theHeroAlias = heroAlias.toPlainText();
+  let theHeroEmail = heroEmail.toPlainText();
+  let addHero = "INSERT INTO `heroes`(`name`,`alias`,`email`) values (" + theHeroName + "," + theHeroAlias + "," + theHeroEmail + ");"
+  console.log(addHero);
+})
+
+const menu = new QMenu();
 
 const herolist = [];
 
@@ -71,6 +87,9 @@ removeSuperHeros.setText("Add Super Hero");
 
 rootLayout.addWidget(label);
 rootLayout.addWidget(addSuperHerobutton);
+rootLayout.addWidget(heroName);
+rootLayout.addWidget(heroAlias);
+rootLayout.addWidget(heroEmail);
 rootLayout.addWidget(listSuperHeros);
 rootLayout.addWidget(showSuperHeros);
 rootLayout.addWidget(removeSuperHeros);
@@ -87,6 +106,10 @@ win.setStyleSheet(
       font-size: 16px;
       font-weight: bold;
       padding: 1;
+    }
+    #heroName, #heroEmail, #heroAlias{
+      height: 20px;
+      width: 100px;
     }
   `
 );
