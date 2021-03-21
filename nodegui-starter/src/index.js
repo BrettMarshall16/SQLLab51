@@ -1,4 +1,4 @@
-import { QMainWindow, QWidget, QLabel, FlexLayout, QPushButton, QPlainTextEdit, QListWidget, QListWidgetItem } from '@nodegui/nodegui';
+import { QMainWindow, QWidget, QLabel, FlexLayout, QPushButton, QPlainTextEdit, QListWidget, QListWidgetItem, QLineEdit } from '@nodegui/nodegui';
 const mysql = require('mysql');
 const database = mysql.createConnection({
   host    :'localhost',
@@ -64,9 +64,9 @@ heroEmailLbl.setText("Enter Hero Email:");
 const heroEmail = new QLineEdit();
 heroEmail.setObjectName("heroEmail");
 addSuperHerobutton.addEventListener('clicked', ()=>{
-  let theHeroName = heroName.toPlainText();
-  let theHeroAlias = heroAlias.toPlainText();
-  let theHeroEmail = heroEmail.toPlainText();
+  let theHeroName = heroName.text();
+  let theHeroAlias = heroAlias.text();
+  let theHeroEmail = heroEmail.text();
   let addHero = "INSERT INTO `heroes`(`name`,`alias`,`email`) values ('"+ theHeroName + "'" + "," + "'" + theHeroAlias + "'" + "," + "'" + theHeroEmail + "');";
   console.log(addHero);
     database.query(addHero,function(err, result){
@@ -76,8 +76,8 @@ addSuperHerobutton.addEventListener('clicked', ()=>{
 })
   
 
-
 const heroList = new QListWidget();
+heroList.setObjectName("heroList");
 const listSuperHeros = new QPushButton();
 listSuperHeros.setText("List Super Heros");
 listSuperHeros.addEventListener("clicked", () => {
@@ -85,21 +85,24 @@ listSuperHeros.addEventListener("clicked", () => {
     database.query(listHeroTable ,function(err, results){
       if(err) throw err;
       for (let result of results){
+        console.log(result);
         let string = JSON.stringify(result);
         let parse = JSON.parse(string);
-        let insert = parse.name + " " + parse.alias + " " + parse.email;
+        console.log(parse);
+        let insert = parse.idx + " " + parse.name + " " + parse.alias + " " + parse.email;
         let tempListItem = new QListWidgetItem();
         tempListItem.setText(insert);
         heroList.addItem(tempListItem);
       }
     });
 });
+
 const addASkill = new QPushButton();
 addASkill.setText("Add A Skill");
-const theSkill = new QPlainTextEdit();
+const theSkill = new QLineEdit();
 theSkill.setObjectName("theSkill");
 addASkill.addEventListener('clicked', ()=>{
-  let theSkillToAdd = theSkill.toPlainText();
+  let theSkillToAdd = theSkill.text();
   let addSkill = "INSERT INTO `skills`(`skill_name`) values ('" + theSkillToAdd + "');";
   console.log(addSkill);
   database.query(addSkill,function(err, result){
@@ -112,13 +115,13 @@ const skillList = new QListWidget();
 const listTheSkills = new QPushButton();
 listTheSkills.setText("List The Skills");
 listTheSkills.addEventListener("clicked", () => {
-  let listSkillsTable = 'SELECT * FROM skills';
+  let listSkillsTable = 'SELECT * FROM skills ORDER BY SKILL_INDEX';
     database.query(listSkillsTable ,function(err, results){
       if(err) throw err;
       for (let result of results){
         let string = JSON.stringify(result);
         let parse = JSON.parse(string);
-        let insert = parse.skill_name;
+        let insert = parse.skill_index + " " + parse.skill_name;
         let tempListItem = new QListWidgetItem();
         tempListItem.setText(insert);
         skillList.addItem(tempListItem);
@@ -136,7 +139,7 @@ removeSuperHeros.setText("Add Super Hero");
 
 //LAYOUT!@#!@#!@#!@#!@#
 
-rootLayout.addWidget(label);
+rootLayout.addWidget(welcomeLbl);
 rootLayout.addWidget(addSuperHerobutton);
 rootLayout.addWidget(heroNameLbl);
 rootLayout.addWidget(heroName);
@@ -168,7 +171,10 @@ win.setStyleSheet(
     }
     #heroName, #heroEmail, #heroAlias{
       height: 20px;
-      width: 100px;
+      width: 200px;
+    }
+    #heroList{
+      width: 500px;
     }
   `
 );
