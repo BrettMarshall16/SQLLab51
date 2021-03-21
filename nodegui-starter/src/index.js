@@ -67,7 +67,10 @@ addSuperHerobutton.addEventListener('clicked', ()=>{
   let theHeroAlias = heroAlias.text();
   let theHeroEmail = heroEmail.text();
   let addHero = "INSERT INTO `heroes`(`name`,`alias`,`email`) values ('"+ theHeroName + "'" + "," + "'" + theHeroAlias + "'" + "," + "'" + theHeroEmail + "');";
-  console.log(addHero);
+  heroName.clear();
+  heroAlias.clear();
+  heroEmail.clear();
+  //console.log(addHero);
     database.query(addHero,function(err, result){
         if(err) throw err;
         console.log("Hero Added");
@@ -86,10 +89,10 @@ listSuperHeros.addEventListener("clicked", () => {
     database.query(listHeroTable ,function(err, results){
       if(err) throw err;
       for (let result of results){
-        console.log(result);
+        //console.log(result);
         let string = JSON.stringify(result);
         let parse = JSON.parse(string);
-        console.log(parse);
+        //console.log(parse);
         let insert = parse.idx + " " + parse.name + " " + parse.alias + " " + parse.email;
         let tempListItem = new QListWidgetItem();
         tempListItem.setText(insert);
@@ -99,17 +102,16 @@ listSuperHeros.addEventListener("clicked", () => {
 });
 
 
+// Remove a hero by index
 const removeHeroBtn = new QPushButton();
 removeHeroBtn.setText("Delete hero (index)");
 const deleteHero = new QLineEdit();
 deleteHero.setObjectName("deleteHero");
 removeHeroBtn.addEventListener("clicked", () => {
 
-
   let listHeroesQuery = 'SELECT idx FROM heroes';
   let heroIdx = deleteHero.text();
-
-  
+  deleteHero.clear();
 
   database.query(listHeroesQuery ,function(err, results){
     for (let result of results){
@@ -143,6 +145,7 @@ addASkill.addEventListener('clicked', ()=>{
 
   let theSkillToAdd = theSkill.text();
   let listSkillsTable = 'SELECT * FROM skills ORDER BY SKILL_INDEX';
+  theSkill.clear();
 
   database.query(listSkillsTable ,function(err, results){
     
@@ -151,7 +154,6 @@ addASkill.addEventListener('clicked', ()=>{
     for (let result of results){
       let string = JSON.stringify(result);
       let parse = JSON.parse(string);
-
       if (theSkillToAdd == parse.skill_name) {
         console.log("Name already exists");
         dupNameChk = false;
@@ -161,7 +163,7 @@ addASkill.addEventListener('clicked', ()=>{
     // Adds skill if name doesn't exist
     if (dupNameChk) {
       let addSkill = "INSERT INTO `skills`(`skill_name`) values ('" + theSkillToAdd + "');";
-      console.log(addSkill);
+      //console.log(addSkill);
       database.query(addSkill,function(err, result){
         if(err) throw err;
         console.log("Skill Added");
@@ -169,7 +171,6 @@ addASkill.addEventListener('clicked', ()=>{
     }
 
   })
-
 });
 
 
@@ -196,6 +197,33 @@ listTheSkills.addEventListener("clicked", () => {
 });
 
 
+// Remove a skill by index
+const removeSkillBtn = new QPushButton();
+removeSkillBtn.setText("Delete hero (index)");
+const removeSkill = new QLineEdit();
+removeSkill.setObjectName("removeSkill");
+removeSkillBtn.addEventListener("clicked", () => {
+
+  let listSkillsQuery = 'SELECT skill_index FROM skills';
+  let skillIdx = removeSkill.text();
+  removeSkill.clear();
+
+  database.query(listSkillsQuery ,function(err, results){
+    for (let result of results){
+      let string = JSON.stringify(result);
+      let parse = JSON.parse(string);
+      if (skillIdx == parse.skill_index) {
+
+        let deleteQuery = 'DELETE FROM skills WHERE skill_index=' + skillIdx; 
+        database.query(deleteQuery ,function(err, results){})
+
+        console.log("Skill " + skillIdx + " " + "deleted.");
+      }
+    }
+
+  })
+
+}); 
 
 
 
@@ -225,7 +253,8 @@ rootLayout.addWidget(theSkill);
 rootLayout.addWidget(listTheSkills);
 rootLayout.addWidget(skillList);
 
-
+rootLayout.addWidget(removeSkillBtn);
+rootLayout.addWidget(removeSkill);
 
 win.setCentralWidget(centralWidget);
 win.setStyleSheet(
