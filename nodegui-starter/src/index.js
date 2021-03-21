@@ -1,10 +1,10 @@
 import { QMainWindow, QWidget, QLabel, FlexLayout, QPushButton, QPlainTextEdit, QListWidget, QListWidgetItem } from '@nodegui/nodegui';
 const mysql = require('mysql');
 const database = mysql.createConnection({
-    host    :'localhost',
-    user    :'nodejs',
-    password:'nodejspassword',
-    database:'superheroes'
+  host    :'localhost',
+  user    :'nodejs',
+  password:'nodejspassword',
+  database:'superheroes'
 });
 database.connect(function(err){
     if (err) throw err;
@@ -27,6 +27,7 @@ database.connect(function(err){
     
 })
 
+
 const win = new QMainWindow();
 win.setWindowTitle("Hello World Test");
 
@@ -36,18 +37,32 @@ centralWidget.setObjectName("myroot");
 const rootLayout = new FlexLayout();
 centralWidget.setLayout(rootLayout);
 
-const label = new QLabel();
-label.setObjectName("topLabel");
-label.setText("Welcome to the list of Super Heros");
+const welcomeLbl = new QLabel();
+welcomeLbl.setObjectName("welcomeLbl");
+welcomeLbl.setText("Welcome to the list of Super Heroes");
 
+
+// Adds hero to the database with contents of 3 QLineEdit fields
 const addSuperHerobutton = new QPushButton();
 addSuperHerobutton.setText("Add Super Hero");
-const heroName = new QPlainTextEdit();
+
+const heroNameLbl = new QLabel();
+heroNameLbl.setObjectName("heroNameLbl");
+heroNameLbl.setText("Enter Hero Name:");
+const heroName = new QLineEdit();
 heroName.setObjectName("heroName");
-const heroAlias = new QPlainTextEdit();
-heroAlias.setObjectName("heroName");
-const heroEmail = new QPlainTextEdit();
-heroEmail.setObjectName("heroName");
+
+const heroAliasLbl = new QLabel();
+heroAliasLbl.setObjectName("heroAliasLbl");
+heroAliasLbl.setText("Enter Hero Alias:");
+const heroAlias = new QLineEdit();
+heroAlias.setObjectName("heroAlias");
+
+const heroEmailLbl = new QLabel();
+heroEmailLbl.setObjectName("heroEmailLbl");
+heroEmailLbl.setText("Enter Hero Email:");
+const heroEmail = new QLineEdit();
+heroEmail.setObjectName("heroEmail");
 addSuperHerobutton.addEventListener('clicked', ()=>{
   let theHeroName = heroName.toPlainText();
   let theHeroAlias = heroAlias.toPlainText();
@@ -59,6 +74,8 @@ addSuperHerobutton.addEventListener('clicked', ()=>{
         console.log("Hero Added");
     })
 })
+  
+
 
 const heroList = new QListWidget();
 const listSuperHeros = new QPushButton();
@@ -121,9 +138,13 @@ removeSuperHeros.setText("Add Super Hero");
 
 rootLayout.addWidget(label);
 rootLayout.addWidget(addSuperHerobutton);
+rootLayout.addWidget(heroNameLbl);
 rootLayout.addWidget(heroName);
+rootLayout.addWidget(heroAliasLbl);
 rootLayout.addWidget(heroAlias);
+rootLayout.addWidget(heroEmailLbl);
 rootLayout.addWidget(heroEmail);
+
 rootLayout.addWidget(listSuperHeros);
 rootLayout.addWidget(heroList);
 rootLayout.addWidget(addASkill);
@@ -152,3 +173,4 @@ win.setStyleSheet(
   `
 );
 win.show();
+global.win = win; // To prevent win from being garbage collected.
