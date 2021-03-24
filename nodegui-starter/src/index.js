@@ -66,12 +66,12 @@ addSuperHerobutton.addEventListener('clicked', ()=>{
   let theHeroName = heroName.text();
   let theHeroAlias = heroAlias.text();
   let theHeroEmail = heroEmail.text();
-  let addHero = "INSERT INTO `heroes`(`name`,`alias`,`email`) values ('"+ theHeroName + "'" + "," + "'" + theHeroAlias + "'" + "," + "'" + theHeroEmail + "');";
+  //let addHero = "INSERT INTO `heroes`(`name`,`alias`,`email`) values ('"+ theHeroName + "'" + "," + "'" + theHeroAlias + "'" + "," + "'" + theHeroEmail + "');";
   heroName.clear();
   heroAlias.clear();
   heroEmail.clear();
   //console.log(addHero);
-    database.query(addHero,function(err, result){
+    database.query("INSERT INTO `heroes`(`name`,`alias`,`email`) values (?,?,?);",[theHeroName,theHeroAlias,theHeroEmail],function(err, result){
         if(err) throw err;
         console.log("Hero Added");
     })
@@ -119,8 +119,8 @@ removeHeroBtn.addEventListener("clicked", () => {
       let parse = JSON.parse(string);
       if (heroIdx == parse.idx) {
 
-        let deleteQuery = 'DELETE FROM heroes WHERE idx=' + heroIdx; 
-        database.query(deleteQuery ,function(err, results){})
+        //let deleteQuery = 'DELETE FROM heroes WHERE idx=' + heroIdx; 
+        database.query('DELETE FROM heroes WHERE idx=?',[heroIdx],function(err, results){})
 
         console.log("Hero " + heroIdx + " " + "deleted.");
       }
@@ -129,9 +129,6 @@ removeHeroBtn.addEventListener("clicked", () => {
   })
 
 }); 
-
-
-
 
 
 
@@ -162,9 +159,9 @@ addASkill.addEventListener('clicked', ()=>{
 
     // Adds skill if name doesn't exist
     if (dupNameChk) {
-      let addSkill = "INSERT INTO `skills`(`skill_name`) values ('" + theSkillToAdd + "');";
+      //let addSkill = "INSERT INTO `skills`(`skill_name`) values ('" + theSkillToAdd + "');";
       //console.log(addSkill);
-      database.query(addSkill,function(err, result){
+      database.query("INSERT INTO `skills`(`skill_name`) values (?);",[theSkillToAdd], function(err, result){
         if(err) throw err;
         console.log("Skill Added");
       });
@@ -199,7 +196,7 @@ listTheSkills.addEventListener("clicked", () => {
 
 // Remove a skill by index
 const removeSkillBtn = new QPushButton();
-removeSkillBtn.setText("Delete hero (index)");
+removeSkillBtn.setText("Delete skill (index)");
 const removeSkill = new QLineEdit();
 removeSkill.setObjectName("removeSkill");
 removeSkillBtn.addEventListener("clicked", () => {
@@ -214,8 +211,8 @@ removeSkillBtn.addEventListener("clicked", () => {
       let parse = JSON.parse(string);
       if (skillIdx == parse.skill_index) {
 
-        let deleteQuery = 'DELETE FROM skills WHERE skill_index=' + skillIdx; 
-        database.query(deleteQuery ,function(err, results){})
+        //let deleteQuery = 'DELETE FROM skills WHERE skill_index=' + skillIdx; 
+        database.query('DELETE FROM skills WHERE skill_index=?',[skillIdx],function(err, results){})
 
         console.log("Skill " + skillIdx + " " + "deleted.");
       }
