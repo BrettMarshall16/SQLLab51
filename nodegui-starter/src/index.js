@@ -76,7 +76,35 @@ addSuperHerobutton.addEventListener('clicked', ()=>{
         console.log("Hero Added");
     })
 })
-  
+ 
+// Edit super hero
+const editSuperHeroButton = new QPushButton();
+editSuperHeroButton.setText("Edit Super Hero");
+const editHeroLbl = new QLabel();
+editHeroLbl.setObjectName("editHeroLbl");
+editHeroLbl.setText("Enter the heros index you wish to edit:");
+const editHero = new QLineEdit();
+editHero.setObjectName("editHero");
+const editHeroAliasLabel = new QLabel();
+editHeroAliasLabel.setObjectName("editHeroAlias");
+editHeroAliasLabel.setText("Enter the new Alias");
+const editHeroAlias = new QLineEdit();
+editHeroAlias.setObjectName("editHero");
+editSuperHeroButton.addEventListener('clicked', ()=>{
+  let theEditedHero = editHero.text();
+  let theNewAlias = editHeroAlias.text();
+  //let addHero = "INSERT INTO `heroes`(`name`,`alias`,`email`) values ('"+ theHeroName + "'" + "," + "'" + theHeroAlias + "'" + "," + "'" + theHeroEmail + "');";
+  editHero.clear();
+  editHeroAlias.clear();
+  //console.log(addHero);
+    database.query("UPDATE heroes SET alias = ? WHERE idx =?;",[theNewAlias,theEditedHero],function(err, result){
+        if(err) throw err;
+        console.log("Hero Edited");
+    })
+})
+
+
+
 
 // List super heroes
 const heroList = new QListWidget();
@@ -238,6 +266,12 @@ rootLayout.addWidget(heroAlias);
 rootLayout.addWidget(heroEmailLbl);
 rootLayout.addWidget(heroEmail);
 
+rootLayout.addWidget(editSuperHeroButton);
+rootLayout.addWidget(editHeroLbl);
+rootLayout.addWidget(editHero);
+rootLayout.addWidget(editHeroAliasLabel);
+rootLayout.addWidget(editHeroAlias);
+
 rootLayout.addWidget(listSuperHeros);
 rootLayout.addWidget(heroList);
 
@@ -261,6 +295,7 @@ win.setStyleSheet(
       height: '100%';
       align-items: 'center';
       justify-content: 'center';
+      
     }
     #mylabel {
       font-size: 16px;
