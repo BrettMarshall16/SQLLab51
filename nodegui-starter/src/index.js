@@ -1,4 +1,4 @@
-import { QMainWindow, QWidget, QLabel, FlexLayout, QPushButton, QPlainTextEdit, QListWidget, QListWidgetItem, QLineEdit } from '@nodegui/nodegui';
+import { QMainWindow, QWidget, QLabel, FlexLayout, QPushButton, QPlainTextEdit, QListWidget, QListWidgetItem, QLineEdit, QGridLayout, Component } from '@nodegui/nodegui';
 const mysql = require('mysql');
 const database = mysql.createConnection({
   host    :'localhost',
@@ -27,14 +27,20 @@ database.connect(function(err){
     
 })
 
+// Setup
 const win = new QMainWindow();
 win.setWindowTitle("Super Heroes");
 
 const centralWidget = new QWidget();
 centralWidget.setObjectName("myroot");
-const rootLayout = new FlexLayout();
-centralWidget.setLayout(rootLayout);
+const rootLayout = new QGridLayout();
+rootLayout.setObjectName("rootlayout");
+centralWidget.setLayout(rootLayout, 25, 1);
+const space = new QLabel();
 
+
+
+// Welcome label
 const welcomeLbl = new QLabel();
 welcomeLbl.setObjectName("welcomeLbl");
 welcomeLbl.setText("Welcome to the list of Super Heroes");
@@ -42,9 +48,6 @@ welcomeLbl.setText("Welcome to the list of Super Heroes");
 
 
 // Add super hero
-const addSuperHerobutton = new QPushButton();
-addSuperHerobutton.setText("Add Super Hero");
-
 const heroNameLbl = new QLabel();
 heroNameLbl.setObjectName("heroNameLbl");
 heroNameLbl.setText("Enter Hero Name:");
@@ -62,15 +65,18 @@ heroEmailLbl.setObjectName("heroEmailLbl");
 heroEmailLbl.setText("Enter Hero Email:");
 const heroEmail = new QLineEdit();
 heroEmail.setObjectName("heroEmail");
+
+
+const addSuperHerobutton = new QPushButton();
+addSuperHerobutton.setText("Add Super Hero");
+addSuperHerobutton.setObjectName("addSuperHerobutton")
 addSuperHerobutton.addEventListener('clicked', ()=>{
   let theHeroName = heroName.text();
   let theHeroAlias = heroAlias.text();
   let theHeroEmail = heroEmail.text();
-  //let addHero = "INSERT INTO `heroes`(`name`,`alias`,`email`) values ('"+ theHeroName + "'" + "," + "'" + theHeroAlias + "'" + "," + "'" + theHeroEmail + "');";
   heroName.clear();
   heroAlias.clear();
   heroEmail.clear();
-  //console.log(addHero);
     database.query("INSERT INTO `heroes`(`name`,`alias`,`email`) values (?,?,?);",[theHeroName,theHeroAlias,theHeroEmail],function(err, result){
         if(err) throw err;
         console.log("Hero Added");
@@ -78,25 +84,24 @@ addSuperHerobutton.addEventListener('clicked', ()=>{
 })
  
 // Edit super hero
-const editSuperHeroButton = new QPushButton();
-editSuperHeroButton.setText("Edit Super Hero");
 const editHeroLbl = new QLabel();
 editHeroLbl.setObjectName("editHeroLbl");
 editHeroLbl.setText("Enter the heros index you wish to edit:");
 const editHero = new QLineEdit();
 editHero.setObjectName("editHero");
 const editHeroAliasLabel = new QLabel();
-editHeroAliasLabel.setObjectName("editHeroAlias");
+editHeroAliasLabel.setObjectName("editHeroAliasLabel");
 editHeroAliasLabel.setText("Enter the new Alias");
 const editHeroAlias = new QLineEdit();
-editHeroAlias.setObjectName("editHero");
+editHeroAlias.setObjectName("editHeroAlias");
+const editSuperHeroButton = new QPushButton();
+editSuperHeroButton.setText("Edit Super Hero");
+editSuperHeroButton.setObjectName("editSuperHeroButton")
 editSuperHeroButton.addEventListener('clicked', ()=>{
   let theEditedHero = editHero.text();
   let theNewAlias = editHeroAlias.text();
-  //let addHero = "INSERT INTO `heroes`(`name`,`alias`,`email`) values ('"+ theHeroName + "'" + "," + "'" + theHeroAlias + "'" + "," + "'" + theHeroEmail + "');";
   editHero.clear();
   editHeroAlias.clear();
-  //console.log(addHero);
     database.query("UPDATE heroes SET alias = ? WHERE idx =?;",[theNewAlias,theEditedHero],function(err, result){
         if(err) throw err;
         console.log("Hero Edited");
@@ -117,11 +122,7 @@ listSuperHeros.addEventListener("clicked", () => {
     database.query(listHeroTable ,function(err, results){
       if(err) throw err;
       for (let result of results){
-        //console.log(result);
-        let string = JSON.stringify(result);
-        let parse = JSON.parse(string);
-        //console.log(parse);
-        let insert = parse.idx + " " + parse.name + " " + parse.alias + " " + parse.email;
+        let insert = "Index: " + result.idx + "  Name: " + result.name + "  Alias: " + result.alias + "  Email: " + result.email;
         let tempListItem = new QListWidgetItem();
         tempListItem.setText(insert);
         heroList.addItem(tempListItem);
@@ -142,20 +143,17 @@ removeHeroBtn.addEventListener("clicked", () => {
   deleteHero.clear();
 
   database.query(listHeroesQuery ,function(err, results){
+    if (err) throw err;
     for (let result of results){
-      let string = JSON.stringify(result);
-      let parse = JSON.parse(string);
-      if (heroIdx == parse.idx) {
-
-        //let deleteQuery = 'DELETE FROM heroes WHERE idx=' + heroIdx; 
-        database.query('DELETE FROM heroes WHERE idx=?',[heroIdx],function(err, results){})
-
+      if (heroIdx == result.idx) {
+        database.query('DELETE FROM heroes WHERE idx=?',[heroIdx],function(err, results){if (err) throw err})
         console.log("Hero " + heroIdx + " " + "deleted.");
-      }
+      } 
     }
 
-  })
+    
 
+  })
 }); 
 
 
@@ -177,9 +175,7 @@ addASkill.addEventListener('clicked', ()=>{
     // Checks if added skill already exists
     let dupNameChk = true;
     for (let result of results){
-      let string = JSON.stringify(result);
-      let parse = JSON.parse(string);
-      if (theSkillToAdd == parse.skill_name) {
+      if (theSkillToAdd == result.skill_name) {
         console.log("Name already exists");
         dupNameChk = false;
       }
@@ -187,8 +183,6 @@ addASkill.addEventListener('clicked', ()=>{
 
     // Adds skill if name doesn't exist
     if (dupNameChk) {
-      //let addSkill = "INSERT INTO `skills`(`skill_name`) values ('" + theSkillToAdd + "');";
-      //console.log(addSkill);
       database.query("INSERT INTO `skills`(`skill_name`) values (?);",[theSkillToAdd], function(err, result){
         if(err) throw err;
         console.log("Skill Added");
@@ -211,9 +205,7 @@ listTheSkills.addEventListener("clicked", () => {
     database.query(listSkillsTable ,function(err, results){
       if(err) throw err;
       for (let result of results){
-        let string = JSON.stringify(result);
-        let parse = JSON.parse(string);
-        let insert = parse.skill_index + " " + parse.skill_name;
+        let insert = "Index: " + result.skill_index + "  Skill: " + result.skill_name;
         let tempListItem = new QListWidgetItem();
         tempListItem.setText(insert);
         skillList.addItem(tempListItem);
@@ -235,14 +227,11 @@ removeSkillBtn.addEventListener("clicked", () => {
 
   database.query(listSkillsQuery ,function(err, results){
     for (let result of results){
-      let string = JSON.stringify(result);
-      let parse = JSON.parse(string);
-      if (skillIdx == parse.skill_index) {
+      if (skillIdx == result.skill_index) {
 
-        //let deleteQuery = 'DELETE FROM skills WHERE skill_index=' + skillIdx; 
-        database.query('DELETE FROM skills WHERE skill_index=?',[skillIdx],function(err, results){})
-
+        database.query('DELETE FROM skills WHERE skill_index=?',[skillIdx],function(err, results){if(err) throw err})
         console.log("Skill " + skillIdx + " " + "deleted.");
+
       }
     }
 
@@ -252,64 +241,136 @@ removeSkillBtn.addEventListener("clicked", () => {
 
 
 
+// List has_skills table
+const hasSkillList = new QListWidget();
+const hasSkillBtn = new QPushButton();
+hasSkillBtn.setText("List The Skills");
+hasSkillBtn.addEventListener("clicked", () => {
+  hasSkillList.clear();
+  let listHasSkillsTable = 'SELECT * FROM has_skills ORDER BY hereos_idx';
+    database.query(listHasSkillsTable ,function(err, results){
+      if(err) throw err;
+      for (let result of results){
+        let insert = "Hero Index: " + result.hereos_idx + "  Skill Index: " + result.skill_idx;
+        let tempListItem = new QListWidgetItem();
+        tempListItem.setText(insert);
+        hasSkillList.addItem(tempListItem);
+      }
+    });
+});
 
 
-//LAYOUT!@#!@#!@#!@#!@#
+// Add skill to hero
+const addSkillToHero = new QPushButton();
+addSkillToHero.setText("Add Skill to Hero");
+const addSkillToHeroLabel = new QLabel();
+addSkillToHeroLabel.setObjectName("addSkillToHeroLabel");
+addSkillToHeroLabel.setText("Enter a Skill index:");
+const skillToAddIndex = new QLineEdit();
+heroName.setObjectName("SkillToADd");
+const addHeroToSkillLabel = new QLabel();
+addHeroToSkillLabel.setObjectName("addHeroToSkillLabel");
+addHeroToSkillLabel.setText("Enter Hero Index:");
+const HeroToAddIndex = new QLineEdit();
+heroAlias.setObjectName("HeroToAdd");
+addSkillToHero.addEventListener('clicked', ()=>{
+  let skillindex = skillToAddIndex.text();
+  let heroindex = HeroToAddIndex.text();
+  skillToAddIndex.clear();
+  HeroToAddIndex.clear();
+    database.query("INSERT INTO `has_skills`(`hereos_idx`,`skill_idx`) values (?,?);",[heroindex,skillindex],function(err, result){
+        if(err) throw err;
+        console.log("Skill added to hero!");
+    })
+})
+
+
+
+// Does hero have needed skill?
+const neededSkillList = new QListWidget();
+const neededSkillBtn = new QPushButton();
+const neededSkillIndex = new QLineEdit();
+neededSkillBtn.setText("List Heroes With Skill (index)");
+neededSkillBtn.addEventListener("clicked", () => {
+  neededSkillList.clear();
+  let neededSkill = neededSkillIndex.text();
+  let listHasSkillsTable = 'SELECT * FROM has_skills ORDER BY hereos_idx';
+    database.query(listHasSkillsTable ,function(err, results){
+      if(err) throw err;
+      for (let result of results){
+        if (neededSkill == result.skill_idx) {
+          let insert = "Hero Index: " + result.hereos_idx + "  Has Skill: " + result.skill_idx;
+          let tempListItem = new QListWidgetItem();
+          tempListItem.setText(insert);
+          neededSkillList.addItem(tempListItem);
+        }
+        
+      }
+    });
+});
+
+
+
+//Layout
+rootLayout.setHorizontalSpacing(20);
+//rootLayout.setVerticalSpacing(20);
+rootLayout.setColumnMinimumWidth(0, 600)
+rootLayout.setColumnMinimumWidth(1, 200)
 
 rootLayout.addWidget(welcomeLbl);
 
-rootLayout.addWidget(addSuperHerobutton);
-rootLayout.addWidget(heroNameLbl);
-rootLayout.addWidget(heroName);
-rootLayout.addWidget(heroAliasLbl);
-rootLayout.addWidget(heroAlias);
-rootLayout.addWidget(heroEmailLbl);
-rootLayout.addWidget(heroEmail);
+rootLayout.addWidget(heroNameLbl, 2, 0);
+rootLayout.addWidget(heroName, 2, 1);
+rootLayout.addWidget(heroAliasLbl, 3, 0);
+rootLayout.addWidget(heroAlias, 3, 1);
+rootLayout.addWidget(heroEmailLbl, 4, 0);
+rootLayout.addWidget(heroEmail, 4, 1);
+rootLayout.addWidget(addSuperHerobutton, 5, 0);
 
-rootLayout.addWidget(editSuperHeroButton);
-rootLayout.addWidget(editHeroLbl);
-rootLayout.addWidget(editHero);
-rootLayout.addWidget(editHeroAliasLabel);
-rootLayout.addWidget(editHeroAlias);
+rootLayout.addWidget(editHeroLbl, 6, 0);
+rootLayout.addWidget(editHero, 6, 1);
+rootLayout.addWidget(editHeroAliasLabel, 7, 0);
+rootLayout.addWidget(editHeroAlias, 7, 1);
+rootLayout.addWidget(editSuperHeroButton, 8, 0);
 
-rootLayout.addWidget(listSuperHeros);
-rootLayout.addWidget(heroList);
+rootLayout.addWidget(heroList, 9, 0);
+rootLayout.addWidget(listSuperHeros, 9, 1);
 
-rootLayout.addWidget(removeHeroBtn);
-rootLayout.addWidget(deleteHero);
+rootLayout.addWidget(deleteHero, 10, 0);
+rootLayout.addWidget(removeHeroBtn, 10, 1);
 
-rootLayout.addWidget(addASkill);
-rootLayout.addWidget(theSkill);
+rootLayout.addWidget(theSkill, 11, 0);
+rootLayout.addWidget(addASkill, 11, 1);
 
-rootLayout.addWidget(listTheSkills);
-rootLayout.addWidget(skillList);
+rootLayout.addWidget(skillList, 12, 0);
+rootLayout.addWidget(listTheSkills, 12, 1);
 
-rootLayout.addWidget(removeSkillBtn);
-rootLayout.addWidget(removeSkill);
+rootLayout.addWidget(removeSkill, 13, 0);
+rootLayout.addWidget(removeSkillBtn, 13, 1);
+
+rootLayout.addWidget(addSkillToHeroLabel, 14, 0);
+rootLayout.addWidget(skillToAddIndex, 15, 0);
+rootLayout.addWidget(addHeroToSkillLabel, 16, 0);
+rootLayout.addWidget(HeroToAddIndex, 17, 0);
+rootLayout.addWidget(addSkillToHero, 17, 1);
+
+rootLayout.addWidget(hasSkillList, 18, 0)
+rootLayout.addWidget(hasSkillBtn, 18, 1)
+
+rootLayout.addWidget(neededSkillList, 19, 0)
+rootLayout.addWidget(neededSkillIndex, 19, 1)
+rootLayout.addWidget(neededSkillBtn, 20, 1)
 
 win.setCentralWidget(centralWidget);
 win.setStyleSheet(
   `
     #myroot {
-      background-color: #009688;
-      height: '100%';
-      align-items: 'center';
-      justify-content: 'center';
-      
+      background-color: #0059b3;
     }
-    #mylabel {
-      font-size: 16px;
-      font-weight: bold;
-      padding: 1;
+    #welcomeLbl {
+      font-size: large;
     }
-    #heroName, #heroEmail, #heroAlias{
-      height: 20px;
-      width: 200px;
-    }
-    #heroList{
-      width: 500px;
-    }
+
   `
 );
 win.show();
-global.win = win; // To prevent win from being garbage collected.
