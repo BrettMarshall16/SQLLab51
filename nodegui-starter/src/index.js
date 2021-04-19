@@ -313,12 +313,10 @@ neededSkillBtn.addEventListener("clicked", () => {
 // Display Hero Info
 const heroesSkillsList = new QListWidget();
 const heroesSkillsBtn = new QPushButton();
-const heroesSkillIndex = new QLineEdit();
-heroesSkillsBtn.setText("List Heroes With Skill (index)");
+heroesSkillsBtn.setText("List Heroes Information (index)");
 heroesSkillsBtn.addEventListener("clicked", () => {
   heroesSkillsList.clear();
-  let heroSkill = heroesSkillIndex.text();
-  let heroInfoSQL = "select name,alias,email GROUP_CONCAT(DISTINCT skill_name ORDER BY skill_name DESC SEPARATOR ',') as Their_Skills from heroes join has_skills on heroes.idx = has_skills.hereos_idx join skills on has_skills.skill_idx = skills.skill_index;"
+  let heroInfoSQL = "select `name`,`alias`,`email`, GROUP_CONCAT(DISTINCT skill_name ORDER BY skill_name DESC SEPARATOR ',') as Their_Skills from heroes join has_skills on heroes.idx = has_skills.hereos_idx join skills on has_skills.skill_idx = skills.skill_index GROUP BY `name`;"
     database.query(heroInfoSQL ,function(err, results){
       if(err) throw err;
       for (let result of results) {
@@ -387,8 +385,7 @@ rootLayout.addWidget(neededSkillIndex, 19, 1)
 rootLayout.addWidget(neededSkillBtn, 20, 1)
 
 rootLayout.addWidget(heroesSkillsList, 21, 0)
-rootLayout.addWidget(heroesSkillIndex, 21, 1)
-rootLayout.addWidget(heroesSkillsBtn, 22, 1)
+rootLayout.addWidget(heroesSkillsBtn, 21, 1)
 
 win.setCentralWidget(centralWidget);
 win.setStyleSheet(
