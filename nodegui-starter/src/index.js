@@ -299,25 +299,40 @@ neededSkillBtn.addEventListener("clicked", () => {
       if(err) throw err;
       for (let result of results){
         if (neededSkill == result.skill_idx) {
-
-          let heroWithSkill = 'SELECT * FROM has_skills where hereos_idx = '+neededSkill+' ORDER BY hereos_idx';
-          database.query(heroWithSkill ,function(err, results){
-            if(err) throw err;
-            for (let result of results) {
               let insert = "Hero Index: " + result.hereos_idx + "  Has Skill: " + result.skill_idx;
               let tempListItem = new QListWidgetItem();
               tempListItem.setText(insert);
               neededSkillList.addItem(tempListItem);
-            }
-          });
-
 
         }
 
-        
       }
-    });
-});
+    });});
+
+
+// Display Hero Info
+const heroesSkillsList = new QListWidget();
+const heroesSkillsBtn = new QPushButton();
+const heroesSkillIndex = new QLineEdit();
+heroesSkillsBtn.setText("List Heroes With Skill (index)");
+heroesSkillsBtn.addEventListener("clicked", () => {
+  heroesSkillsList.clear();
+  let heroSkill = heroesSkillIndex.text();
+  let heroInfoSQL = "select name,alias,email GROUP_CONCAT(DISTINCT skill_name ORDER BY skill_name DESC SEPARATOR ',') as Their_Skills from heroes join has_skills on heroes.idx = has_skills.hereos_idx join skills on has_skills.skill_idx = skills.skill_index;"
+    database.query(heroInfoSQL ,function(err, results){
+      if(err) throw err;
+      for (let result of results) {
+        let insert = "Hero name: " + result.name + "  Hero Alias: " + result.alias + "  Hero Email: " + result.email + "  Hero Skills: " + result.Their_Skills;
+        let tempListItem = new QListWidgetItem();
+        tempListItem.setText(insert);
+        neededSkillList.addItem(tempListItem);
+      }
+    })
+  });
+            
+        
+
+
 
 
 
@@ -370,6 +385,10 @@ rootLayout.addWidget(hasSkillBtn, 18, 1)
 rootLayout.addWidget(neededSkillList, 19, 0)
 rootLayout.addWidget(neededSkillIndex, 19, 1)
 rootLayout.addWidget(neededSkillBtn, 20, 1)
+
+rootLayout.addWidget(heroesSkillsList, 21, 0)
+rootLayout.addWidget(heroesSkillIndex, 21, 1)
+rootLayout.addWidget(heroesSkillsBtn, 22, 1)
 
 win.setCentralWidget(centralWidget);
 win.setStyleSheet(
