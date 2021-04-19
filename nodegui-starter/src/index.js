@@ -244,7 +244,7 @@ removeSkillBtn.addEventListener("clicked", () => {
 // List has_skills table
 const hasSkillList = new QListWidget();
 const hasSkillBtn = new QPushButton();
-hasSkillBtn.setText("List The Skills");
+hasSkillBtn.setText("List Who Has What Skills");
 hasSkillBtn.addEventListener("clicked", () => {
   hasSkillList.clear();
   let listHasSkillsTable = 'SELECT * FROM has_skills ORDER BY hereos_idx';
@@ -299,11 +299,21 @@ neededSkillBtn.addEventListener("clicked", () => {
       if(err) throw err;
       for (let result of results){
         if (neededSkill == result.skill_idx) {
-          let insert = "Hero Index: " + result.hereos_idx + "  Has Skill: " + result.skill_idx;
-          let tempListItem = new QListWidgetItem();
-          tempListItem.setText(insert);
-          neededSkillList.addItem(tempListItem);
+
+          let heroWithSkill = 'SELECT * FROM has_skills where hereos_idx = '+neededSkill+'ORDER BY hereos_idx';
+          database.query(listHasSkillsTable ,function(err, results){
+            if(err) throw err;
+            for (let result of results) {
+              let insert = "Hero Index: " + result.hereos_idx + "  Has Skill: " + result.skill_idx;
+              let tempListItem = new QListWidgetItem();
+              tempListItem.setText(insert);
+              neededSkillList.addItem(tempListItem);
+            }
+          });
+
+
         }
+
         
       }
     });
