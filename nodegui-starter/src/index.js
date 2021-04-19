@@ -300,8 +300,8 @@ neededSkillBtn.addEventListener("clicked", () => {
       for (let result of results){
         if (neededSkill == result.skill_idx) {
 
-          let heroWithSkill = 'SELECT * FROM has_skills where hereos_idx = '+neededSkill+'ORDER BY hereos_idx';
-          database.query(listHasSkillsTable ,function(err, results){
+          let heroWithSkill = 'SELECT * FROM has_skills where hereos_idx = '+neededSkill+' ORDER BY hereos_idx';
+          database.query(heroWithSkill ,function(err, results){
             if(err) throw err;
             for (let result of results) {
               let insert = "Hero Index: " + result.hereos_idx + "  Has Skill: " + result.skill_idx;
